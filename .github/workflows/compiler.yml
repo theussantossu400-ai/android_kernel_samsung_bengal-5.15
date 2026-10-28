@@ -1,0 +1,41 @@
+name: Compilador Kernel A05s
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Baixando o Codigo
+      uses: actions/checkout@v3
+      with:
+        ref: android-13
+
+    - name: Configurando as Ferramentas do Google
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc build-essential libssl-dev localmodconfig bistrip libelf-dev flex bison
+        mkdir -p $GITHUB_WORKSPACE/clang
+        cd $GITHUB_WORKSPACE/clang
+        wget https://googlesource.com
+        tar -xf clang-r487747c.tar.gz
+
+    - name: Injetando o KernelSU Nativo
+      run: |
+        cd $GITHUB_WORKSPACE
+        curl -LSs "https://githubusercontent.com" | bash -s main
+
+    - name: Compilando o Kernel Bengal
+      run: |
+        export PATH=$GITHUB_WORKSPACE/clang/bin:$PATH
+        export ARCH=arm64
+        export SUBARCH=arm64
+        export CROSS_COMPILE=aarch64-linux-android-
+        make O=out ARCH=arm64 vendor/bengal-gki_defconfig
+        make -j$(nproc) O=out ARCH=arm64 CC=clang CLANG_TRIPLE=aarch64-linux-gnu-
+
+    - name: Gerando e Subindo o Boot.img Pronto
+      uses: actions/upload-artifact@v3
+      with:
+        name: Kernel-A05s-ClocksMaximos-KernelSU
+        path: out/arch/arm64/boot/Image
