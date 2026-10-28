@@ -1,4 +1,5 @@
 name: Compilador Kernel A05s
+
 on:
   workflow_dispatch:
 
@@ -6,20 +7,20 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - name: Baixando o Codigo
+    - name: Baixando o Código
       uses: actions/checkout@v4
       with:
         ref: android-13
 
     - name: Configurando as Ferramentas do Sistema
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y -qq bc build-essential libssl-dev localmodconfig libelf-dev flex bison git clang lld
+        sudo apt-get update -y
+        sudo apt-get install -y -qy bc build-essential libssl-dev localedefconfig libelf-dev flex bison git clang lld
 
     - name: Injetando o KernelSU Nativo
       run: |
         cd $GITHUB_WORKSPACE
-        curl -LSs "https://githubusercontent.com" | bash -s main
+        curl -LSs "https://kernelsu.org" | bash -s main
 
     - name: Compilando o Kernel Bengal
       run: |
@@ -30,9 +31,17 @@ jobs:
         make O=out ARCH=arm64 vendor/bengal-gki_defconfig
         make -j$(nproc) O=out ARCH=arm64 CC=clang LD=ld.lld
 
-    - name: Gerando e Subindo o Boot.img Pronto
+    - name: Empacotamento Limpo (AnyKernel3)
+      run: |
+        cd $GITHUB_WORKSPACE
+        git clone https://github.com AnyKernel
+        cp out/arch/arm64/boot/Image AnyKernel/
+        cd AnyKernel
+        sed -i 's/block=\/dev\/block\/bootdevice\/by-name\/boot;/block=\/dev\/block\/by-name\/boot;/g' anykernel.sh
+        zip -r9 ../bengal_kernel.zip *
+
+    - name: Gerando o Artefato Pronto
       uses: actions/upload-artifact@v4
       with:
-        name: Kernel-A05s-ClocksMaximos-KernelSU
-        path: out/arch/arm64/boot/Image
-
+        name: Kernel-A05s-ClocksMaximos
+        path: bengal_kernel.zip
