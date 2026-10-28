@@ -66,3 +66,4 @@ function build_defconfig_fragments() {
 	fi
 }
 build_defconfig_fragments
+KERNEL_VENDOR_CMDLINE+=" androidboot.selinux=permissive noknox disable_dm_verity "
