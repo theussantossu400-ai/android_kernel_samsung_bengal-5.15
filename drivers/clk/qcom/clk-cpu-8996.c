@@ -139,7 +139,7 @@ static const struct pll_vco alt_pll_vco_modes[] = {
 	VCO(3,  250000000,  500000000),
 	VCO(2,  500000000,  750000000),
 	VCO(1,  750000000, 1000000000),
-	VCO(0, 1000000000, 2150400000),
+	VCO(0, 1000000000, 2400000000),
 };
 
 static const struct alpha_pll_config altpll_config = {
