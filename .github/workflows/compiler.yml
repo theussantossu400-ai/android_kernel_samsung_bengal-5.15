@@ -17,11 +17,17 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y -qy bc build-essential libssl-dev libelf-dev flex bison git lld nano zip
 
-    - name: Clonando o Compilador Clang do AOSP
+    - name: Configurando Compilador Nativo da Árvore
       run: |
         cd $GITHUB_WORKSPACE
-        git clone --depth=1 https://github.com clang
-        echo "$GITHUB_WORKSPACE/clang/bin" >> $GITHUB_PATH
+        # Procura o clang pré-instalado na árvore da Samsung e coloca no PATH
+        CLANG_DIR=$(find . -type d -name "clang-*" | head -n 1)
+        if [ -d "$CLANG_DIR/bin" ]; then
+          echo "$(pwd)/$CLANG_DIR/bin" >> $GITHUB_PATH
+        else
+          # Caso não ache a pasta, usa o compilador padrão do ambiente
+          echo "/usr/bin" >> $GITHUB_PATH
+        fi
 
     - name: Injetando o KernelSU Nativo
       run: |
@@ -51,4 +57,3 @@ jobs:
       with:
         name: Kernel-A05s-ClocksMaximos
         path: bengal_kernel.zip
-
