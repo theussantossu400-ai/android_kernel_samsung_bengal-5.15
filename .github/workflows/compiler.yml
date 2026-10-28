@@ -15,7 +15,16 @@ jobs:
     - name: Configurando as Ferramentas do Sistema
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y -qy bc build-essential libssl-dev localedefconfig libelf-dev flex bison git clang lld
+        sudo apt-get install -y -qy bc build-essential libssl-dev libelf-dev flex bison git lld nano zip
+
+    - name: Baixando o Provedor Clang Oficial do AOSP
+      run: |
+        cd $GITHUB_WORKSPACE
+        mkdir clang
+        cd clang
+        wget https://googlesource.com
+        tar -xf clang-r487747c.tar.gz
+        echo "$GITHUB_WORKSPACE/clang/bin" >> $GITHUB_PATH
 
     - name: Injetando o KernelSU Nativo
       run: |
